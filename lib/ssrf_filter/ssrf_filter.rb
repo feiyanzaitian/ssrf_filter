@@ -191,7 +191,7 @@ class SsrfFilter
 
     with_forced_hostname(hostname, ip) do
       # ::Net::HTTP.start(uri.hostname, uri.port, **http_options) do |http|
-      ::Net::HTTP.start(uri.hostname, uri.port, "httpproxy-tcop.vip.ebay.com", "80", **http_options) do |http|
+      ::Net::HTTP::Proxy("httpproxy-tcop.vip.ebay.com", "80").start(uri.hostname, uri.port, **http_options) do |http|
         http.request(request) do |response|
           case response
           when ::Net::HTTPRedirection
