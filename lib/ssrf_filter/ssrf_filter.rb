@@ -176,6 +176,7 @@ class SsrfFilter
     puts uri
     puts ip
     puts verb
+    tempUri = uri
     if options[:params]
       params = uri.query ? ::URI.decode_www_form(uri.query).to_h : {}
       params.merge!(options[:params])
@@ -203,9 +204,9 @@ class SsrfFilter
 
     with_forced_hostname(hostname, ip) do
       # ::Net::HTTP.start(uri.hostname, uri.port, **http_options) do |http|
-      puts uri.hostname
-      puts uri.port
-      ::Net::HTTP.start(uri.hostname, uri.port, 'httpproxy-tcop.vip.ebay.com', '80', nil, nil, **http_options) do |http|
+      puts tempUri.hostname
+      puts tempUri.port
+      ::Net::HTTP.start(tempUri.hostname, tempUri.port, 'httpproxy-tcop.vip.ebay.com', '80', nil, nil, **http_options) do |http|
       # ::Net::HTTP::Proxy("httpproxy-tcop.vip.ebay.com", "80").start(uri.hostname, uri.port, **http_options) do |http|
         http.request(request) do |response|
           case response
