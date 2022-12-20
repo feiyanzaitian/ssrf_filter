@@ -174,6 +174,8 @@ class SsrfFilter
 
   def self.fetch_once(uri, ip, verb, options, &block)
     puts uri
+    hostname1 = uri.hostname
+    puts hostname1
     puts ip
     puts verb
     tempUri = uri
@@ -204,16 +206,11 @@ class SsrfFilter
 
     with_forced_hostname(hostname, ip) do
       # ::Net::HTTP.start(uri.hostname, uri.port, **http_options) do |http|
-      puts tempUri.hostname
-      puts tempUri.port
-      puts tempUri
-      testUrl = URI(tempUri.to_s)
-      puts testUrl
-      puts testUrl.hostname
-      puts testUrl.host
-      puts testUrl.port
       puts "test"
-      Net::HTTP.start(testUrl.hostname, testUrl.port, 'httpproxy-tcop.vip.ebay.com', '80', nil, nil, **http_options) do |http|
+      if hostname1 != 'i.ebayimg.com'
+        hostname1 = 'i.ebayimg.com'
+      end
+      Net::HTTP.start(hostname1, uri.port, 'httpproxy-tcop.vip.ebay.com', '80', nil, nil, **http_options) do |http|
       # ::Net::HTTP::Proxy("httpproxy-tcop.vip.ebay.com", "80").start(uri.hostname, uri.port, **http_options) do |http|
         http.request(request) do |response|
           case response
