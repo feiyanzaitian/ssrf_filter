@@ -108,11 +108,16 @@ class SsrfFilter
     define_singleton_method(method) do |url, options = {}, &block|
       ::SsrfFilter::Patch::SSLSocket.apply!
       ::SsrfFilter::Patch::Resolv.apply!
+      puts url
+      puts options
 
       original_url = url
       scheme_whitelist = options[:scheme_whitelist] || DEFAULT_SCHEME_WHITELIST
+      puts scheme_whitelist
       resolver = options[:resolver] || DEFAULT_RESOLVER
+      puts resolver
       max_redirects = options[:max_redirects] || DEFAULT_MAX_REDIRECTS
+      puts max_redirects
       url = url.to_s
 
       (max_redirects + 1).times do
@@ -123,10 +128,13 @@ class SsrfFilter
         end
 
         hostname = uri.hostname
+        puts hostname
         ip_addresses = resolver.call(hostname)
+        puts ip_addresses
         raise UnresolvedHostname, "Could not resolve hostname '#{hostname}'" if ip_addresses.empty?
 
         public_addresses = ip_addresses.reject(&method(:unsafe_ip_address?))
+        puts public_addresses
         raise PrivateIPAddress, "Hostname '#{hostname}' has no public ip addresses" if public_addresses.empty?
 
         response, url = fetch_once(uri, public_addresses.sample.to_s, method, options, &block)
@@ -165,6 +173,9 @@ class SsrfFilter
   private_class_method :host_header
 
   def self.fetch_once(uri, ip, verb, options, &block)
+    puts uri
+    puts ip
+    puts verb
     if options[:params]
       params = uri.query ? ::URI.decode_www_form(uri.query).to_h : {}
       params.merge!(options[:params])
@@ -188,10 +199,12 @@ class SsrfFilter
 
     http_options = options[:http_options] || {}
     http_options[:use_ssl] = (uri.scheme == 'https')
+    puts http_options
 
     with_forced_hostname(hostname, ip) do
       # ::Net::HTTP.start(uri.hostname, uri.port, **http_options) do |http|
-      ::Net::HTTP::Proxy("httpproxy-tcop.vip.ebay.com", "80").start(uri.hostname, uri.port, **http_options) do |http|
+      ::Net::HTTP.start(uri.hostname, uri.port, "http://httpproxy-tcop.vip.ebay.com", "80", nil, nil, **http_options) do |http|
+      # ::Net::HTTP::Proxy("httpproxy-tcop.vip.ebay.com", "80").start(uri.hostname, uri.port, **http_options) do |http|
         http.request(request) do |response|
           case response
           when ::Net::HTTPRedirection
