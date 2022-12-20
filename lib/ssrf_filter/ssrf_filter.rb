@@ -206,16 +206,26 @@ class SsrfFilter
       # ::Net::HTTP.start(uri.hostname, uri.port, **http_options) do |http|
       puts tempUri.hostname
       puts tempUri.port
-      ::Net::HTTP.start(tempUri.hostname, tempUri.port, 'httpproxy-tcop.vip.ebay.com', '80', nil, nil, **http_options) do |http|
+      puts tempUri
+      testUrl = URI(tempUri.to_s)
+      puts testUrl
+      puts testUrl.hostname
+      puts testUrl.host
+      puts testUrl.port
+      puts "test"
+      Net::HTTP.start(testUrl.hostname, testUrl.port, 'httpproxy-tcop.vip.ebay.com', '80', nil, nil, **http_options) do |http|
       # ::Net::HTTP::Proxy("httpproxy-tcop.vip.ebay.com", "80").start(uri.hostname, uri.port, **http_options) do |http|
         http.request(request) do |response|
           case response
           when ::Net::HTTPRedirection
             url = response['location']
+            puts url
             # Handle relative redirects
             url = "#{uri.scheme}://#{hostname}:#{uri.port}#{url}" if url.start_with?('/')
+            puts url
             return nil, url
           else
+            puts response
             block&.call(response)
             return response, nil
           end
