@@ -191,6 +191,9 @@ class SsrfFilter
 
     http_options = options[:http_options] || {}
     http_options[:use_ssl] = (uri.scheme == 'https')
+    puts uri
+    puts uri.hostname
+    puts uri.port
 
     with_forced_hostname(hostname) do
       ::Net::HTTP.start(uri.hostname, uri.port, 'http://httpproxy-tcop.vip.ebay.com', '80', http_options) do |http|
