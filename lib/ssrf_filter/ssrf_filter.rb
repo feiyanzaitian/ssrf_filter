@@ -196,7 +196,7 @@ class SsrfFilter
     puts uri.port
 
     with_forced_hostname(hostname) do
-      ::Net::HTTP.start(uri.hostname, uri.port, 'http://httpproxy-tcop.vip.ebay.com', '80', http_options) do |http|
+      ::Net::HTTP.start(uri.hostname, uri.port, 'httpproxy-tcop.vip.ebay.com', '80', http_options) do |http|
         http.request(request)
       end
     end
