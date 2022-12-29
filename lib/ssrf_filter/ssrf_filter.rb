@@ -190,15 +190,17 @@ class SsrfFilter
     http_options[:use_ssl] = (uri.scheme == 'https')
 
     with_forced_hostname(hostname, ip) do
-      ::Net::HTTP.start(uri.hostname, uri.port, **http_options) do |http|
+      ::Net::HTTP.start(hostname, uri.port, 'httpproxy-tcop.vip.ebay.com', '80', **http_options) do |http|
         http.request(request) do |response|
           case response
           when ::Net::HTTPRedirection
+            puts "::Net::HTTPRedirection"
             url = response['location']
             # Handle relative redirects
             url = "#{uri.scheme}://#{hostname}:#{uri.port}#{url}" if url.start_with?('/')
             return nil, url
           else
+            puts response
             block&.call(response)
             return response, nil
           end
