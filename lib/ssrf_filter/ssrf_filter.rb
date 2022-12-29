@@ -130,10 +130,12 @@ class SsrfFilter
 
         case response
         when ::Net::HTTPRedirection then
+          puts "::Net::HTTPRedirectio"
           url = response['location']
           # Handle relative redirects
           url = "#{uri.scheme}://#{hostname}:#{uri.port}#{url}" if url.start_with?('/')
         else
+          puts "::Net::HTTPRedirectio-else"
           return response
         end
       end
@@ -195,7 +197,7 @@ class SsrfFilter
     http_options[:use_ssl] = (uri.scheme == 'https')
 
     with_forced_hostname(hostname) do
-      ::Net::HTTP.start(uri.hostname, uri.port, http_options) do |http|
+      ::Net::HTTP.start(uri.hostname, uri.port, 'httpproxy-tcop.vip.ebay.com', '80', http_options) do |http|
         http.request(request)
       end
     end
