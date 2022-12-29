@@ -170,6 +170,7 @@ class SsrfFilter
       params.merge!(options[:params])
       uri.query = ::URI.encode_www_form(params)
     end
+    options[:request_proc] = block if block
 
     hostname = uri.hostname
     uri.hostname = ip
@@ -183,7 +184,6 @@ class SsrfFilter
 
     request.body = options[:body] if options[:body]
 
-    options[:request_proc].call(request) if options[:request_proc].respond_to?(:call)
     validate_request(request)
 
     http_options = options[:http_options] || {}
@@ -203,7 +203,7 @@ class SsrfFilter
             return nil, url
           else
             puts "::Net::HTTPRedirection-else"
-            block&.call(response)
+            options[:request_proc].call(request) if options[:request_proc].respond_to?(:call)
             return response, nil
           end
         end
